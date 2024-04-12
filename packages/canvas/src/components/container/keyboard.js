@@ -48,7 +48,7 @@ function handlerDown({ index, parent }) {
   const id = parent.children[index + 1]?.id
   id && selectNode(id)
 }
-function handlerDelete({ schema }) {
+export const handlerDelete = ({ schema }) => {
   if (hoverState.id === schema.id) {
     clearHover()
   }
@@ -102,7 +102,7 @@ const handleClipboardPaste = (node, schema, parent) => {
   }
 }
 
-const handlerClipboardEvent = (event) => {
+export const handlerClipboardEvent = (event) => {
   const { schema, parent } = getCurrent()
   const node = getClipboardSchema(event)
   switch (event.type) {

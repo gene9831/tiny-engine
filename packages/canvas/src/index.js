@@ -31,6 +31,7 @@ import {
   clearSelect,
   selectNode,
   hoverNode,
+  allowInsert,
   insertNode,
   removeNode,
   addComponent,
@@ -51,8 +52,10 @@ import {
   setGlobalState,
   getGlobalState,
   getDocument,
-  canvasDispatch
+  canvasDispatch,
+  getConfigure
 } from './components/container/container'
+import { handlerClipboardEvent, handlerDelete } from './components/container/keyboard'
 
 export {
   CanvasContainer,
@@ -85,6 +88,7 @@ export {
   insertNode,
   removeNode,
   hoverNode,
+  allowInsert,
   addComponent,
   setPageCss,
   addScript,
@@ -96,7 +100,10 @@ export {
   getGlobalState,
   getDocument,
   canvasDispatch,
-  createRender
+  createRender,
+  getConfigure,
+  handlerClipboardEvent,
+  handlerDelete
 }
 
 export default CanvasContainer
