@@ -10,7 +10,12 @@
           </div>
         </div>
         <div class="tiny-engine-right-wrap">
-          <design-settings v-show="layoutState.settings.showDesignSettings" ref="right"></design-settings>
+          <design-settings
+            v-show="layoutState.settings.showDesignSettings && !showTreePlugin"
+            ref="right"
+          ></design-settings>
+          <!-- 画布拖动节点时，显示大纲树 -->
+          <component v-show="showTreePlugin" :is="treePlugin.component"></component>
         </div>
       </div>
     </div>
@@ -18,7 +23,7 @@
 </template>
 
 <script>
-import { reactive, ref, watch, onUnmounted } from 'vue'
+import { computed, reactive, ref, watch, onUnmounted } from 'vue'
 import { ConfigProvider as TinyConfigProvider } from '@opentiny/vue'
 import designSmbConfig from '@opentiny/vue-design-smb'
 import { useResource, useLayout, useEditorInfo, useModal, useApp, useNotify } from '@opentiny/tiny-engine-controller'
@@ -33,6 +38,7 @@ import blockPlugin from '@opentiny/tiny-engine-plugin-block'
 import materials from '@opentiny/tiny-engine-plugin-materials'
 import { useBroadcastChannel } from '@vueuse/core'
 import { constants } from '@opentiny/tiny-engine-utils'
+import { dragState } from '@opentiny/tiny-engine-canvas'
 
 const { message } = useModal()
 const { requestInitBlocks } = blockPlugin.api
@@ -66,6 +72,9 @@ export default {
     const { layoutState } = useLayout()
     const { plugins } = layoutState
     const right = ref(null)
+
+    const treePlugin = addons.plugins.find((plugin) => plugin.id === 'OutlineTree')
+    const showTreePlugin = computed(() => treePlugin && dragState.draging && plugins.render !== 'OutlineTree')
 
     // 此处接收画布内部的错误和警告提示
     const { data } = useBroadcastChannel({ name: BROADCAST_CHANNEL.Notify })
@@ -122,6 +131,8 @@ export default {
       right,
       plugins,
       toggleNav,
+      treePlugin,
+      showTreePlugin,
       addons,
       layoutState,
       designSmbConfig
@@ -154,6 +165,7 @@ export default {
     }
   }
   .tiny-engine-right-wrap {
+    width: var(--base-right-panel-width);
     z-index: 4;
   }
   :deep(.monaco-editor .suggest-widget) {

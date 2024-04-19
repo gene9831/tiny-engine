@@ -573,8 +573,6 @@ export const dragMove = (event, isHover) => {
   const { element } = dragState
   const absolute = canvasState.type === 'absolute'
 
-  dragState.draging = dragState.keydown
-
   dragState.mouse = { x: clientX, y: clientY }
 
   // 如果仅仅是mouseover事件直接return,并重置拖拽位置状态，优化性能
@@ -584,6 +582,8 @@ export const dragMove = (event, isHover) => {
 
     return
   }
+
+  dragState.draging = dragState.keydown
 
   setHoverRect(getElement(event.target), dragState.data)
 

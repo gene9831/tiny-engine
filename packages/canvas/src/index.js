@@ -19,6 +19,7 @@ import Builtin from './components/builtin/builtin.json'
 import RenderMain, { api as renderApi } from './components/render/RenderMain'
 import { createRender } from './components/render/runner'
 import {
+  dragState,
   dragStart,
   updateRect,
   getContext,
@@ -66,6 +67,7 @@ export {
   RenderMain,
   renderApi,
   Builtin,
+  dragState,
   dragStart,
   dragMove,
   updateRect,
