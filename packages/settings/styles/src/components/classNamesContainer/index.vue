@@ -104,7 +104,7 @@
 <script setup>
 import { computed, reactive, ref, nextTick, watch, watchEffect } from 'vue'
 import { Select as TinySelect } from '@opentiny/vue'
-import { useProperties, useCanvas, useHistory, useHelp } from '@opentiny/tiny-engine-meta-register'
+import { useProperties, useCanvas, useMessage, useHelp } from '@opentiny/tiny-engine-meta-register'
 import { LinkButton } from '@opentiny/tiny-engine-common'
 import { CodeConfigurator } from '@opentiny/tiny-engine-configurator'
 import { formatString } from '@opentiny/tiny-engine-common/js/ast'
@@ -442,14 +442,14 @@ watchEffect(() => {
 const save = ({ content }) => {
   const cssString = formatString(content.replace(/"/g, "'"), 'css')
   const { getPageSchema } = useCanvas()
-  const { addHistory } = useHistory()
+  const { publish } = useMessage()
   const { updateRect, setPageCss, getSchema: getCanvasPageSchema } = useCanvas().canvasApi.value
   getPageSchema().css = cssString
   getCanvasPageSchema().css = cssString
   setPageCss(cssString)
   state.schemaUpdateKey++
 
-  addHistory()
+  publish({ topic: 'history_add' })
   updateRect()
 }
 

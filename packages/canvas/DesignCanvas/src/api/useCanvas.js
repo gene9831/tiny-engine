@@ -13,7 +13,7 @@
 /* eslint-disable no-new-func */
 import { reactive, ref } from 'vue'
 import { constants } from '@opentiny/tiny-engine-utils'
-import { useHistory } from '@opentiny/tiny-engine-meta-register'
+import { useMessage } from '@opentiny/tiny-engine-meta-register'
 
 const { COMPONENT_NAME } = constants
 
@@ -53,6 +53,7 @@ const defaultSchema = {
 
 const canvasApi = ref({})
 const isCanvasApiReady = ref(false)
+const { publish } = useMessage()
 
 const initCanvasApi = (newCanvasApi) => {
   canvasApi.value = newCanvasApi
@@ -71,7 +72,7 @@ const resetCanvasState = async (state = {}) => {
 const resetPageCanvasState = (state = {}) => {
   state.isBlock = false
   resetCanvasState(state)
-  useHistory().addHistory(state.pageSchema)
+  publish({ topic: 'history_add', data: state.pageSchema })
 }
 
 // 区块重置画布数据
@@ -120,7 +121,7 @@ const initData = (schema = { ...defaultSchema }, currentPage) => {
     })
   }
 
-  useHistory().addHistory(schema)
+  publish({ topic: 'history_add', data: schema })
 }
 
 const isSaved = () => pageState.isSaved

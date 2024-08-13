@@ -21,7 +21,7 @@
 import { reactive, computed } from 'vue'
 import { extend } from '@opentiny/vue-renderless/common/object'
 import { Input as TinyInput, Popover as TinyPopover } from '@opentiny/vue'
-import { useLayout, useModal, useCanvas, useBlock, useHistory } from '@opentiny/tiny-engine-meta-register'
+import { useLayout, useModal, useCanvas, useBlock, useMessage } from '@opentiny/tiny-engine-meta-register'
 
 export default {
   components: {
@@ -39,6 +39,7 @@ export default {
     const { addBlockProperty, removePropertyLink, getCurrentBlock, editBlockProperty } = useBlock()
     const { PLUGIN_NAME, activePlugin } = useLayout()
     const { schema } = canvasApi.value.getSchema?.() || {}
+    const { publish } = useMessage()
 
     const state = reactive({
       newPropertyName: ''
@@ -78,7 +79,7 @@ export default {
           })
 
           addBlockProperty(newProperty, getCurrentBlock())
-          useHistory().addHistory()
+          publish({ topic: 'history_add' })
         }
       })
     }
@@ -104,7 +105,7 @@ export default {
       Object.assign(props.data, { linked })
 
       editBlockProperty(property, props.data)
-      useHistory().addHistory()
+      publish({ topic: 'history_add' })
     }
 
     const openBlockSetting = () => {
@@ -122,7 +123,7 @@ export default {
 
           if (componentId) {
             removePropertyLink({ componentProperty: property })
-            useHistory().addHistory()
+            publish({ topic: 'history_add' })
           }
         }
       })

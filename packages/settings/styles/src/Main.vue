@@ -67,7 +67,7 @@
 <script>
 import { ref, watch } from 'vue'
 import { Collapse, CollapseItem, Input } from '@opentiny/vue'
-import { useHistory, useCanvas, useProperties } from '@opentiny/tiny-engine-meta-register'
+import { useMessage, useCanvas, useProperties } from '@opentiny/tiny-engine-meta-register'
 import { CodeConfigurator, VariableConfigurator } from '@opentiny/tiny-engine-configurator'
 import { formatString } from '@opentiny/tiny-engine-common/js/ast'
 import {
@@ -120,7 +120,7 @@ export default {
     const { getCurrentSchema } = useCanvas()
     // 获取当前节点 style 对象
     const { state, updateStyle } = useStyle() // updateStyle
-    const { addHistory } = useHistory()
+    const { publish } = useMessage()
     const { getSchema } = useProperties()
 
     // 保存编辑器内容，并回写到 schema
@@ -143,7 +143,7 @@ export default {
         delete currentSchema.props.style
       }
 
-      addHistory()
+      publish({ topic: 'history_add' })
       updateRect()
     }
 
@@ -158,13 +158,13 @@ export default {
         currentSchema.props.style = value
         state.propertiesList = `已绑定：${value.value}`
         state.lineStyleDisable = false
-        addHistory()
+        publish({ topic: 'history_add' })
       } else {
         schema.props.style = ''
         currentSchema.props.style = ''
         state.propertiesList = '编辑行内样式'
         state.lineStyleDisable = true
-        addHistory()
+        publish({ topic: 'history_add' })
       }
 
       updateRect()

@@ -104,7 +104,7 @@ import {
   DropdownMenu as TinyDropdownMenu,
   DropdownItem as TinyDropdownItem
 } from '@opentiny/vue'
-import { useCanvas, useHistory, usePage, useModal } from '@opentiny/tiny-engine-meta-register'
+import { useCanvas, useMessage, usePage, useModal } from '@opentiny/tiny-engine-meta-register'
 import { iconChevronDown } from '@opentiny/vue-icon'
 import { extend } from '@opentiny/vue-renderless/common/object'
 import { useHttp } from '@opentiny/tiny-engine-http'
@@ -178,7 +178,7 @@ export default {
       clearCurrentState()
       // 已经创建过临时页面只更新schema
       initData(pageSettingState.currentPageData['page_content'], pageSettingState.currentPageData)
-      useHistory().addHistory()
+      useMessage().publish({ topic: 'history_add' })
     }
 
     const codeRules = `

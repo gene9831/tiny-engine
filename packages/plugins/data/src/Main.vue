@@ -71,7 +71,7 @@ import { reactive, ref, computed, onActivated, watch } from 'vue'
 import { Button, Search, Tabs, TabItem } from '@opentiny/vue'
 import {
   useCanvas,
-  useHistory,
+  useMessage,
   useEditorInfo,
   useResource,
   useNotify,
@@ -213,7 +213,7 @@ export default {
 
         // 触发画布渲染
         setState({ [name]: variable })
-        useHistory().addHistory()
+        useMessage().publish({ topic: 'history_add' })
       } else {
         const validateResult = validateMonacoEditorData(storeRef.value.getEditor(), 'state字段', { required: true })
         if (!validateResult.success) {

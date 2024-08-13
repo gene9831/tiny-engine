@@ -22,7 +22,7 @@
 <script>
 import { ref } from 'vue'
 import { MetaListItems } from '@opentiny/tiny-engine-common'
-import { useProperties, useMaterial, useHistory } from '@opentiny/tiny-engine-meta-register'
+import { useProperties, useMaterial, useMessage } from '@opentiny/tiny-engine-meta-register'
 import { utils } from '@opentiny/tiny-engine-utils'
 import { iconDel } from '@opentiny/vue-icon'
 
@@ -64,7 +64,7 @@ export default {
     const delChildren = (data) => {
       schemaChildren.splice(children.value.indexOf(data), 1)
       children.value = [...schemaChildren]
-      useHistory().addHistory()
+      useMessage().publish({ topic: 'history_add' })
     }
 
     const dragEnd = (params = {}) => {

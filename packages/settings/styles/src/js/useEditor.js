@@ -11,12 +11,12 @@
  */
 
 import { reactive, watch } from 'vue'
-import { useHistory, useCanvas } from '@opentiny/tiny-engine-meta-register'
+import { useMessage, useCanvas } from '@opentiny/tiny-engine-meta-register'
 import { obj2StyleStr, styleStrRemoveRoot } from './cssConvert'
 import { CSS_TYPE } from './cssType'
 
 export default ({ style, pageState }) => {
-  const { addHistory } = useHistory()
+  const { publish } = useMessage()
 
   // 编辑器状态
   const editor = reactive({
@@ -52,14 +52,14 @@ export default ({ style, pageState }) => {
     if (editor.type === CSS_TYPE.Style) {
       if (pageState.currentSchema?.props) {
         pageState.currentSchema.props.style = styleStrRemoveRoot(content)
-        addHistory()
+        publish({ topic: 'history_add' })
       }
     } else if (editor.type === CSS_TYPE.Css) {
       pageState.pageSchema.css = content
       const { setPageCss } = useCanvas().canvasApi.value
 
       setPageCss(content)
-      addHistory()
+      publish({ topic: 'history_add' })
     }
   }
 

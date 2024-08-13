@@ -106,7 +106,7 @@ import { Popover, Tooltip } from '@opentiny/vue'
 import { IconWriting, IconHelpCircle, IconPlusCircle } from '@opentiny/vue-icon'
 import { typeOf } from '@opentiny/vue-renderless/common/type'
 import {
-  useHistory,
+  useMessage,
   useProperties,
   useMaterial,
   useLayout,
@@ -302,7 +302,7 @@ export default {
         }
       }
 
-      useHistory().addHistory()
+      useMessage().publish({ topic: 'history_add' })
     }
 
     const setVerifyFailed = (result, message) => {

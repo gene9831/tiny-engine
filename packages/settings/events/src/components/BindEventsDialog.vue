@@ -25,7 +25,7 @@ import { ast2String, string2Ast } from '@opentiny/tiny-engine-common/js/ast'
 import {
   getMergeMeta,
   useCanvas,
-  useHistory,
+  useMessage,
   useLayout,
   getMetaApi,
   META_APP
@@ -111,7 +111,7 @@ export default {
 
       nodeProps[eventName].value = `this.${name}`
 
-      useHistory().addHistory()
+      useMessage().publish({ topic: 'history_add' })
     }
 
     const resetTipError = () => {

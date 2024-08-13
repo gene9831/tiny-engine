@@ -12,7 +12,7 @@
 
 import { computed, reactive, watch } from 'vue'
 import { useBroadcastChannel } from '@vueuse/core'
-import { useCanvas, useHistory, useProperties as useProps } from '@opentiny/tiny-engine-meta-register'
+import { useCanvas, useMessage, useProperties as useProps } from '@opentiny/tiny-engine-meta-register'
 import { formatString } from '@opentiny/tiny-engine-common/js/ast'
 import { constants, utils } from '@opentiny/tiny-engine-utils'
 import { parser, stringify, getSelectorArr } from './parser'
@@ -302,7 +302,7 @@ const updateGlobalStyle = (newSelector) => {
 const updateStyle = (properties) => {
   const { canvasApi } = useCanvas()
   const { getSchema } = useProps()
-  const { addHistory } = useHistory()
+  const { publish } = useMessage()
   const { getSchema: getCanvasPageSchema, updateRect } = canvasApi.value
   const schema = getSchema() || getCanvasPageSchema()
   schema.props = schema.props || {}
@@ -334,7 +334,7 @@ const updateStyle = (properties) => {
   // 更新到全局样式
   updateGlobalStyle(randomClassName)
 
-  addHistory()
+  publish({ topic: 'history_add' })
   updateRect()
 }
 

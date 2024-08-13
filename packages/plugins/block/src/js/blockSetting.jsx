@@ -21,7 +21,7 @@ import {
   useApp,
   useLayout,
   useNotify,
-  useHistory,
+  useMessage,
   useMaterial
 } from '@opentiny/tiny-engine-meta-register'
 import { isVsCodeEnv } from '@opentiny/tiny-engine-common/js/environments'
@@ -440,7 +440,7 @@ export const refreshBlockData = async (block = {}) => {
       Object.assign(block, newBlock)
       useLayout().layoutState.pageStatus = getCanvasStatus(newBlock?.occupier)
 
-      useHistory().addHistory(block.content)
+      useMessage().publish({ topic: 'history_add', data: block.content })
     }
   }
 }

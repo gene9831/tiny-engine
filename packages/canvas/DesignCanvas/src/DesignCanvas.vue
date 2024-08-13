@@ -23,7 +23,7 @@ import {
   useCanvas,
   useLayout,
   useMaterial,
-  useHistory,
+  useMessage,
   useModal,
   getMergeRegistry,
   getMergeMeta
@@ -64,6 +64,8 @@ export default {
       pageState.properties = null
     }
 
+    const { publish } = useMessage()
+
     watch(
       [() => useCanvas().isSaved(), () => useLayout().layoutState.pageStatus, () => useCanvas().getPageSchema()],
       ([isSaved, pageStatus, pageSchema], [oldIsSaved, _oldPageStatus, oldPageSchema]) => {
@@ -96,7 +98,10 @@ export default {
 
         // 状态重置
         const resetState = () => {
-          useHistory().go(-1, false)
+          publish({
+            toppic: 'history_go',
+            data: { addend: -1, valid: false }
+          })
           useCanvas().setSaved(true)
           removeNode()
         }
@@ -172,7 +177,7 @@ export default {
       controller: {
         // 需要在canvas/render或内置组件里使用的方法
         getMaterial: useMaterial().getMaterial,
-        addHistory: useHistory().addHistory,
+        addHistory: (schema) => publish({ topic: 'history_add', data: schema }),
         registerBlock: useMaterial().registerBlock,
         request: useHttp(),
         ast

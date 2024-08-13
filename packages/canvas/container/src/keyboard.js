@@ -22,7 +22,7 @@ import {
   clearHover,
   hoverState
 } from './container'
-import { useHistory } from '@opentiny/tiny-engine-meta-register'
+import { useMessage } from '@opentiny/tiny-engine-meta-register'
 import { copyObject } from '../../common'
 import { getClipboardSchema, setClipboardSchema } from './utils'
 
@@ -78,13 +78,15 @@ const handlerArrow = (keyCode) => {
   }
 }
 
+const { publish } = useMessage()
+
 const handlerCtrl = (keyCode) => {
   switch (keyCode) {
     case KEY_Y:
-      useHistory().forward()
+      publish({ topic: 'history_forward' })
       break
     case KEY_Z:
-      useHistory().back()
+      publish({ topic: 'history_back' })
       break
     default:
       break
@@ -122,7 +124,7 @@ const handlerClipboardEvent = (event) => {
 }
 
 const keyboardHandler = (event) => {
-  if (event.ctrlKey) {
+  if (event.ctrlKey && event.key !== 'Control') {
     getCurrent()?.schema && handlerCtrl(event.keyCode)
   }
 

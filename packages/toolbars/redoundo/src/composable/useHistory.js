@@ -11,7 +11,7 @@
  */
 
 import { reactive, isProxy, toRaw, watch } from 'vue'
-import { useCanvas } from '@opentiny/tiny-engine-meta-register'
+import { useCanvas, useMessage } from '@opentiny/tiny-engine-meta-register'
 
 const schema2String = (schema) => {
   if (isProxy(schema)) {
@@ -111,6 +111,36 @@ watch(
     historyState.forward = value < list.length - 1
   }
 )
+
+const { subscribe } = useMessage()
+
+subscribe({
+  topic: 'history_back',
+  callback: () => {
+    back()
+  }
+})
+
+subscribe({
+  topic: 'history_forward',
+  callback: () => {
+    forward()
+  }
+})
+
+subscribe({
+  topic: 'history_go',
+  callback: ({ addend, valid }) => {
+    go(addend, valid)
+  }
+})
+
+subscribe({
+  topic: 'history_add',
+  callback: (schema) => {
+    addHistory(schema)
+  }
+})
 
 export default () => {
   return {
