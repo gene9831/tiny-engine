@@ -99,7 +99,7 @@ const handleClipboardCut = (event, schema) => {
 
 const handleClipboardPaste = (node, schema, parent) => {
   if (node?.componentName && schema?.componentName && allowInsert(getConfigure(schema.componentName), node)) {
-    insertNode({ parent, node: schema, data: { ...node } }, POSITION.IN)
+    insertNode({ inserted: { ...node }, parent, reference: schema }, POSITION.IN)
   }
 }
 

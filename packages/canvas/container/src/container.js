@@ -244,26 +244,21 @@ const getRect = (element) => {
   return element.getBoundingClientRect()
 }
 
-const inserAfter = ({ parent, node, data }) => {
-  const parentChildren = parent.children
-  const index = parentChildren.indexOf(node)
-  parent.children.splice(index + 1, 0, data)
-}
+/**
+ * 设计参考 https://developer.mozilla.org/zh-CN/docs/Web/API/Node/insertBefore
+ * @param {*} insertedNode 被插入的节点
+ * @param {*} parentNode 被插入节点的父节点
+ * @param {*} referenceNode insertedNode 将要插在这个节点之前。如果 referenceNode 为空，则插入到末尾
+ */
+const nodeInsertBefore = (insertedNode, parentNode, referenceNode) => {
+  const parentChildren = parentNode.children
+  let index = parentChildren.indexOf(referenceNode)
 
-const insertBefore = ({ parent, node, data }) => {
-  const parentChildren = parent.children
-  const index = parentChildren.indexOf(node)
-  parent.children.splice(index, 0, data)
-}
-
-const insertInner = ({ node, data }, position) => {
-  node.children = node.children || []
-
-  if (position === POSITION.TOP || position === POSITION.LEFT) {
-    node.children.unshift(data)
-  } else {
-    node.children.push(data)
+  if (index === -1) {
+    index = parentChildren.length
   }
+
+  parentChildren.splice(index, 0, insertedNode)
 }
 
 export const removeNode = ({ parent, node }) => {
@@ -651,29 +646,25 @@ export const hoverNode = (id, data) => {
   element && setHoverRect(element, data)
 }
 
-export const insertNode = (node, position = POSITION.IN, select = true) => {
-  if (!node.parent) {
-    insertInner({ node: canvasState.schema, data: node.data }, position)
-  } else {
-    switch (position) {
-      case POSITION.TOP:
-      case POSITION.LEFT:
-        insertBefore(node)
-        break
-      case POSITION.BOTTOM:
-      case POSITION.RIGHT:
-        inserAfter(node)
-        break
-      case POSITION.IN:
-        insertInner(node)
-        break
-      default:
-        insertInner(node)
-        break
+export const insertNode = (nodes, position = POSITION.IN, select = true) => {
+  if ([POSITION.TOP, POSITION.LEFT, POSITION.BOTTOM, POSITION.RIGHT].includes(position) && nodes.parent) {
+    const { inserted, parent } = nodes
+    let reference = nodes.reference
+
+    if (position === POSITION.BOTTOM || position === POSITION.RIGHT) {
+      const index = parent.children.indexOf(reference)
+      reference = parent.children[index + 1]
     }
+
+    nodeInsertBefore(inserted, parent, reference)
+  } else {
+    // POSITON.IN 插入到reference节点内
+    const parent = nodes.parent ? nodes.reference : canvasState.schema
+    parent.children = parent.children || []
+    nodeInsertBefore(nodes.inserted, parent, null)
   }
 
-  select && setTimeout(() => selectNode(node.data.id))
+  select && setTimeout(() => selectNode(nodes.inserted.id))
 
   getController().addHistory()
 }
@@ -681,7 +672,7 @@ export const insertNode = (node, position = POSITION.IN, select = true) => {
 export const addComponent = (data, position) => {
   const { schema, parent } = getCurrent()
 
-  insertNode({ node: schema, parent, data }, position)
+  insertNode({ inserted: data, parent, reference: schema }, position)
 }
 
 export const copyNode = (id) => {
@@ -690,8 +681,7 @@ export const copyNode = (id) => {
   }
   const { node, parent } = getNode(id, true)
 
-  inserAfter({ parent, node, data: copyObject(node) })
-  getController().addHistory()
+  insertNode({ inserted: copyObject(node), parent, reference: node }, POSITION.BOTTOM)
 }
 
 export const onMouseUp = () => {
@@ -703,18 +693,18 @@ export const onMouseUp = () => {
 
   if (draging && !forbidden) {
     const { parent, node } = getNode(lineId, true) || {} // target
-    const targetNode = { parent, node, data: toRaw(data) }
+    const nodes = { inserted: toRaw(data), parent, reference: node }
 
     if (sourceId) {
       // 内部拖拽
       if (sourceId !== lineId && !absolute) {
         removeNode(getNode(sourceId, true))
-        insertNode(targetNode, position)
+        insertNode(nodes, position)
       }
     } else {
       // 从外部拖拽进来的无ID，insert
       if (absolute) {
-        targetNode.node = getSchema()
+        nodes.reference = getSchema()
         data.props = data.props || {}
         data.props.style = {
           position: 'absolute',
@@ -723,7 +713,7 @@ export const onMouseUp = () => {
         }
       }
 
-      insertNode(targetNode, position)
+      insertNode(nodes, position)
     }
   }
 
