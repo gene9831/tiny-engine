@@ -472,7 +472,8 @@ export default {
       } else if (item.id === 'bridge' || item.id === 'utils') {
         state.bindPrefix = `${CONSTANTS.THIS}${item.id}.`
         const bridge = {}
-        useResource().resState[item.id]?.forEach((res) => {
+        const resState = useResource().getState()
+        resState[item.id]?.forEach((res) => {
           bridge[res.name] = `${item.id}.${res.content.exportName}`
         })
 

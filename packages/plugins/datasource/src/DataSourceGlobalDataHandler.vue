@@ -47,11 +47,12 @@ export default {
   },
   setup() {
     const { confirm } = useModal()
+    const { getState: getResourceState, setState: setResourceState } = useResource()
 
     const state = reactive({
-      dataHandlerValue: useResource().resState?.dataHandler?.value,
-      willFetchValue: useResource().resState.willFetch?.value,
-      errorHandlerValue: useResource().resState?.errorHandler?.value
+      dataHandlerValue: getResourceState()?.dataHandler?.value,
+      willFetchValue: getResourceState().willFetch?.value,
+      errorHandlerValue: getResourceState()?.errorHandler?.value
     })
 
     const saveGlobalDataHandle = () => {
@@ -65,9 +66,9 @@ export default {
 
       requestGlobalDataHandler(id, { data_source_global: handler }).then((data) => {
         if (data) {
-          useResource().resState.dataHandler = { type: 'JSFunction', value: state.dataHandlerValue }
-          useResource().resState.willFetch = { type: 'JSFunction', value: state.willFetchValue }
-          useResource().resState.errorHandler = { type: 'JSFunction', value: state.errorHandlerValue }
+          setResourceState('dataHandler', { type: 'JSFunction', value: state.dataHandlerValue })
+          setResourceState('willFetch', { type: 'JSFunction', value: state.willFetchValue })
+          setResourceState('errorHandler', { type: 'JSFunction', value: state.errorHandlerValue })
           confirm({
             title: '提示',
             message: '全局请求处理函数设置成功'

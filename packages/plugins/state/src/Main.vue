@@ -300,7 +300,7 @@ export default {
     }
 
     const removeStore = (key) => {
-      const storeListt = [...useResource().resState.globalState] || []
+      const storeListt = [...useResource().getState().globalState] || []
       const index = storeListt.findIndex((store) => store.id === key)
       const { setGlobalState } = useCanvas().canvasApi.value
 

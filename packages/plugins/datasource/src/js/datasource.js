@@ -54,17 +54,13 @@ const defaultWillFetch = createFn(DEFAULT_INTERCEPTOR.willFetch.value)
 const defaultErrorHandler = createFn(DEFAULT_INTERCEPTOR.errorHandler.value)
 
 export const getRequest = (config) => {
-  const globalDataHandle = useResource().resState.dataHandler
-    ? createFn(useResource().resState.dataHandler.value)
-    : defaultDataHandler
+  const resState = useResource().getState()
 
-  const globalErrorHandler = useResource().resState.errorHandler
-    ? createFn(useResource().resState.errorHandler.value)
-    : defaultErrorHandler
+  const globalDataHandle = resState.dataHandler ? createFn(resState.dataHandler.value) : defaultDataHandler
 
-  const globalWillFetch = useResource().resState.willFetch
-    ? createFn(useResource().resState.willFetch.value)
-    : defaultWillFetch
+  const globalErrorHandler = resState.errorHandler ? createFn(resState.errorHandler.value) : defaultErrorHandler
+
+  const globalWillFetch = resState.willFetch ? createFn(resState.willFetch.value) : defaultWillFetch
 
   const http = axios.create()
 

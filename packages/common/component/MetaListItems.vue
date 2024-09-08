@@ -103,7 +103,7 @@ export default {
   },
   setup(props, { emit }) {
     const listItemOption = computed(() => props)
-    const { resState } = useResource()
+    const resState = useResource().getState()
 
     const changeItem = (params) => {
       const optionsList = [...props.optionsList]

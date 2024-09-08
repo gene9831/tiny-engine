@@ -117,7 +117,7 @@ const getI18nData = () => {
 }
 
 const getI18n = async ({ init, local }) => {
-  const { resState } = useResource()
+  const resState = useResource().getState()
 
   if (local) {
     const locales = resState?.langs?.locales || []

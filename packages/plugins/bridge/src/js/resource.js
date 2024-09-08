@@ -173,6 +173,8 @@ const generateBridgeUtil = (...args) => {
   }
 }
 
+const { getState: getResourceState } = useResource()
+
 export const saveResource = (data, callback, emit) => {
   const { updateUtils } = useCanvas().canvasApi.value
 
@@ -180,8 +182,10 @@ export const saveResource = (data, callback, emit) => {
     data.id = state.resource.id
     requestUpdateReSource(data).then((result) => {
       if (result) {
-        const index = useResource().resState[data.category].findIndex((item) => item.name === result.name)
-        useResource().resState[data.category][index] = result
+        const resState = getResourceState()
+        // TODO 这里设置 resState 非常灵活，如何使用 api 规范化?
+        const index = resState[data.category].findIndex((item) => item.name === result.name)
+        resState[data.category][index] = result
 
         // 更新画布工具函数环境，保证渲染最新工具类返回值, 并触发画布的强制刷新
         updateUtils([result])
@@ -200,7 +204,7 @@ export const saveResource = (data, callback, emit) => {
   } else {
     requestAddReSource(data).then((result) => {
       if (result) {
-        useResource().resState[data.category].push(result)
+        getResourceState()[data.category].push(result)
 
         // 更新画布工具函数环境，保证渲染最新工具类返回值, 并触发画布的强制刷新
         updateUtils([result])
@@ -223,8 +227,10 @@ export const deleteData = (name, callback, emit) => {
 
   requestDeleteReSource(params).then((data) => {
     if (data) {
-      const index = useResource().resState[state.type].findIndex((item) => item.name === data.name)
-      useResource().resState[state.type].splice(index, 1)
+      const resState = getResourceState()
+      // TODO 这里设置 resState 非常灵活，如何使用 api 规范化?
+      const index = resState[state.type].findIndex((item) => item.name === data.name)
+      resState[state.type].splice(index, 1)
 
       deleteUtils([data])
       generateBridgeUtil(useApp().appInfoState.selectedId)

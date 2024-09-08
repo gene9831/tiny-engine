@@ -11,7 +11,8 @@ import {
   useApp,
   useNotify,
   useResource,
-  useCanvas
+  useCanvas,
+  useMessage
 } from '@opentiny/tiny-engine-meta-register'
 import { isVsCodeEnv } from '@opentiny/tiny-engine-common/js/environments'
 import { useBroadcastChannel } from '@vueuse/core'
@@ -61,7 +62,7 @@ export default {
       useCanvas().isCanvasApiReady,
       (ready) => {
         if (ready) {
-          useResource().fetchResource()
+          useMessage().publish({ topic: 'fetchResource' })
         }
       },
       {

@@ -22,6 +22,7 @@ import {
   useBreadcrumb,
   useLayout,
   useBlock,
+  useMessage,
   useMaterial,
   getMetaApi,
   META_APP
@@ -165,11 +166,44 @@ const fetchResource = async ({ isInit = true } = {}) => {
   }
 }
 
+const { subscribe } = useMessage()
+
+const init = () => {
+  subscribe({
+    topic: 'fetchResource',
+    callback: (...args) => {
+      fetchResource(...args)
+    }
+  })
+}
+
+const getState = () => resState
+
+/**
+ *
+ * @param {string} key 支持 "a.b.c" 的格式
+ * @param {any} value
+ * @returns
+ */
+const setState = (key, value) => {
+  const keys = key.split('.')
+  let current = resState
+
+  for (let i = 0; i < keys.length - 1; i++) {
+    if (!Object.keys(current).includes(keys[i])) {
+      return
+    }
+    current = current[keys[i]]
+  }
+
+  current[keys[keys.length - 1]] = value
+}
+
 export default function () {
   return {
-    resState,
-    fetchResource,
-    initPageOrBlock,
+    init,
+    getState,
+    setState,
     handlePopStateEvent
   }
 }

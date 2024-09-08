@@ -75,7 +75,7 @@ export default {
     const { dataSourceState, saveDataSource } = useDataSource()
 
     onMounted(() => {
-      dataSourceList.value = useResource().resState.dataSource
+      dataSourceList.value = useResource().getState().dataSource
     })
 
     const showSettingIcon = (itemIndex) => {

@@ -45,7 +45,7 @@ export default {
     }
   },
   setup(props) {
-    const { resState } = useResource()
+    const resState = useResource().getState()
 
     const propertyList = computed(() => {
       const properties = JSON.parse(JSON.stringify(props.properties))

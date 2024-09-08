@@ -85,5 +85,13 @@ export function initHook(hookName, hookContent, { useDefaultExport } = {}) {
     Object.assign(hooksState[hookName], hookContent)
   }
 
+  if (typeof hooksState[hookName] === 'function') {
+    // TODO 这里执行函数缺少参数，目前好像所有的useXXX hook都不需要参数
+    const apis = hooksState[hookName]()
+    if (typeof apis.init === 'function') {
+      apis.init()
+    }
+  }
+
   return hooksState[hookName]
 }

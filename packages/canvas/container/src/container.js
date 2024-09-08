@@ -789,8 +789,10 @@ export const deleteState = (variable) => {
   getRenderer().deleteState(variable)
 }
 
+const { getState: getResourceState, setState: setResourceState } = useResource()
+
 export const setGlobalState = (state) => {
-  useResource().resState.globalState = state
+  setResourceState('globalState', state)
   getRenderer().setGlobalState(state)
 }
 
@@ -911,10 +913,11 @@ export const initCanvas = ({ renderer, iframe, emit, controller }) => {
     senterMessage({ type: 'i18nReady', value: true }, '*')
   }
 
-  setGlobalState(useResource().resState.globalState)
-  renderer.setDataSourceMap(useResource().resState.dataSource)
+  const resState = getResourceState()
+  setGlobalState(resState.globalState)
+  renderer.setDataSourceMap(resState.dataSource)
   // 设置画布全局的utils工具类上下文环境
-  setUtils(useResource().resState.utils)
+  setUtils(resState.utils)
   setSchema(schema)
   setConfigure(useMaterial().getConfigureMap())
   canvasDispatch('updateDependencies', { detail: useMaterial().materialState.thirdPartyDeps })
