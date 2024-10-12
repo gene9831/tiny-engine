@@ -1,7 +1,9 @@
 <template>
   <tiny-popover class="block-link-field" popper-class="option-popper block-new-attr-popover">
     <template #reference>
-      <span class="link-icon">+</span>
+      <span class="icon-wrap">
+        <svg-icon name="block-bind-prop"></svg-icon>
+      </span>
     </template>
     <ul class="context-menu">
       <li v-if="isLinked" class="menu-item" @click="unLink(data)">取消关联</li>
@@ -57,8 +59,6 @@ export default {
           render() {
             return (
               <div>
-                <div>此新字段将自动链接到此属性</div>
-                <br />
                 <TinyInput placeholder="请输入字段名称" v-model={state.newPropertyName}></TinyInput>
               </div>
             )
@@ -141,18 +141,19 @@ export default {
 }
 </script>
 <style lang="less" scoped>
-.link-icon {
-  width: 16px;
-  height: 16px;
-  margin: 0 5px;
-  border-radius: 50%;
-  line-height: 16px;
-  text-align: center;
-  color: var(--ti-lowcode-block-link-field-link-icon-color);
-  background-color: var(--ti-lowcode-block-link-field-link-icon-bg-color);
-  cursor: pointer;
-  &:hover {
-    transform: scale(1.2);
+.icon-wrap {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  transform: translate(-50%, -50%);
+
+  .svg-icon {
+    font-size: 14px;
+  }
+
+  &:hover .svg-icon {
+    transform: scale(1.25);
   }
 }
 
