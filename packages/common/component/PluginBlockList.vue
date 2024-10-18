@@ -19,16 +19,11 @@
       @mouseleave="handleBlockItemLeave"
     >
       <slot :data="item">
-        <div class="block-item-img">
-          <img
-            v-if="item.screenshot"
-            class="item-image"
-            :src="item.screenshot || defaultImg"
-            draggable="false"
-            @error="$event.target.src = defaultImg"
-          />
-          <svg-icon v-else class="item-image item-default-img" name="block-default"></svg-icon>
-        </div>
+        <plugin-block-item-img
+          :item="item"
+          :show-checkbox="showCheckbox"
+          :checked="checked.some((block) => block.id === item.id)"
+        ></plugin-block-item-img>
         <div class="item-text">
           <div class="item-name">{{ item.name_cn || item.label || item.content?.fileName }}</div>
           <div v-if="blockStyle === 'list'" class="item-description">{{ item.description }}</div>
@@ -121,6 +116,7 @@
 import { computed, watch, inject, reactive } from 'vue'
 import { iconPlus } from '@opentiny/vue-icon'
 import { Progress, Tooltip } from '@opentiny/vue'
+import PluginBlockItemImg from './PluginBlockItemImg.vue'
 import SearchEmpty from './SearchEmpty.vue'
 import SvgButton from './SvgButton.vue'
 
@@ -132,6 +128,7 @@ export default {
     TinyProgress: Progress,
     IconPlus: iconPlus(),
     TinyTooltip: Tooltip,
+    PluginBlockItemImg,
     SvgButton,
     SearchEmpty
   },
@@ -191,6 +188,20 @@ export default {
     externalBlock: {
       type: Object,
       default: null
+    },
+    // 是否显示多选框
+    showCheckbox: {
+      type: Boolean,
+      default: false
+    },
+    // 选中的区块
+    checked: {
+      type: Array,
+      default: () => []
+    },
+    gridColumns: {
+      type: Number,
+      default: 2
     }
   },
   emits: ['click', 'iconClick', 'add', 'deleteBlock', 'openVersionPanel', 'editBlock'],
@@ -373,13 +384,12 @@ export default {
 
 .block-list {
   display: grid;
-  grid-template-columns: 50% 50%;
+  grid-template-columns: repeat(v-bind('gridColumns'), 1fr);
   position: relative;
-  flex: 1;
+  gap: 12px;
   overflow-y: auto;
   overflow-x: hidden;
   color: var(--ti-lowcode-common-secondary-text-color);
-  margin: 12px;
 
   &.is-small-list {
     grid-template-columns: 100%;
@@ -393,15 +403,7 @@ export default {
     height: 110px;
     text-align: center;
     user-select: none;
-    margin-right: 6px;
-    margin-bottom: 12px;
-    .block-item-img {
-      line-height: 86px;
-      width: 100%;
-      height: 86px;
-      border-radius: 4px;
-      background-color: var(--ti-lowcode-component-block-list-item-active-bg);
-    }
+
     &.block-item-small-list:nth-child(2) {
       border-top: none;
     }
@@ -574,10 +576,6 @@ export default {
       right: 0px;
       top: 0;
     }
-  }
-  .block-item:nth-child(even) {
-    margin-right: 0;
-    margin-left: 6px;
   }
   .deploy {
     position: absolute;
