@@ -1,4 +1,7 @@
 <template>
+  <div v-if="showCheckbox && displayTable" class="table-selection">
+    <tiny-checkbox v-model="computedChecked" @change="handleCheck"></tiny-checkbox>
+  </div>
   <div class="block-item-img">
     <img
       v-if="item.screenshot"
@@ -8,7 +11,7 @@
       @error="$event.target.src = defaultImg"
     />
     <svg-icon v-else class="item-image item-default-img" name="block-default"></svg-icon>
-    <div v-if="showCheckbox" class="checkbox">
+    <div v-if="showCheckbox && !displayTable" class="top-left">
       <tiny-checkbox v-model="computedChecked" @change="handleCheck"></tiny-checkbox>
     </div>
   </div>
@@ -38,6 +41,10 @@ export default {
     showCheckbox: {
       type: Boolean,
       default: false
+    },
+    displayTable: {
+      type: Boolean,
+      default: false
     }
   },
   emits: ['check'],
@@ -64,20 +71,20 @@ export default {
   align-items: center;
   justify-content: center;
   width: 100%;
-  height: 86px;
+  flex: 1;
   border-radius: 4px;
   background-color: var(--ti-lowcode-component-block-list-item-active-bg);
 
-  .checkbox {
+  .top-left {
     display: flex;
     position: absolute;
     top: 4px;
     right: 4px;
-
-    :deep(.tiny-checkbox__label) {
-      padding: 0;
-    }
   }
+}
+
+:deep(.tiny-checkbox__label) {
+  padding: 0;
 }
 
 .item-image {

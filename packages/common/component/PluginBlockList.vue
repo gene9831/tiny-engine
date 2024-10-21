@@ -1,4 +1,10 @@
 <template>
+  <div v-if="blockStyle === 'mini'" class="header">
+    <div class="col-checkbox"></div>
+    <div class="col-name">区块名称</div>
+    <div class="col-time">创建时间</div>
+    <div class="col-created-by">创建人</div>
+  </div>
   <ul
     v-if="state.data.length || showAddButton"
     :class="['block-list', 'lowcode-scrollbar', { 'is-small-list': blockStyle === 'mini' }, { isShortcutPanel }]"
@@ -23,10 +29,18 @@
           :item="item"
           :show-checkbox="showCheckbox"
           :checked="checked.some((block) => block.id === item.id)"
+          :display-table="blockStyle === 'mini'"
         ></plugin-block-item-img>
         <div class="item-text">
           <div class="item-name">{{ item.name_cn || item.label || item.content?.fileName }}</div>
           <div v-if="blockStyle === 'list'" class="item-description">{{ item.description }}</div>
+        </div>
+
+        <div v-if="blockStyle === 'mini'" class="cell cell-time">
+          <span>{{ formatDate(new Date(item.created_at)) }}</span>
+        </div>
+        <div v-if="blockStyle === 'mini'" class="cell cell-created-by">
+          <span>{{ users.find((user) => user.id === item.id)?.name || item.id }}</span>
         </div>
 
         <div v-if="item.isShowProgress" class="progress-bar">
@@ -207,6 +221,7 @@ export default {
   emits: ['click', 'iconClick', 'add', 'deleteBlock', 'openVersionPanel', 'editBlock'],
   setup(props, { emit }) {
     const panelState = inject('panelState', {})
+    const blockUsers = inject('blockUsers')
     const state = reactive({
       activeIndex: -1,
       data: computed(() => props.data),
@@ -217,6 +232,8 @@ export default {
       currentShowMenuId: null,
       timeoutId: null
     })
+
+    const users = computed(() => blockUsers?.value || [])
 
     const getParentNode = (el) => {
       while (el.nodeName !== 'LI') {
@@ -328,9 +345,21 @@ export default {
       }
     )
 
+    const formatDate = (date) => {
+      const year = date.getFullYear()
+      const month = String(date.getMonth() + 1).padStart(2, '0')
+      const day = String(date.getDate()).padStart(2, '0')
+      const hours = String(date.getHours()).padStart(2, '0')
+      const minutes = String(date.getMinutes()).padStart(2, '0')
+      const seconds = String(date.getSeconds()).padStart(2, '0')
+
+      return `${year}/${month}/${day} ${hours}:${minutes}:${seconds}`
+    }
+
     return {
       isShortcutPanel: panelState.isShortcutPanel,
       state,
+      users,
       getTitle,
       blockClick,
       iconClick,
@@ -343,7 +372,8 @@ export default {
       handleBlockItemLeave,
       handleSettingMouseOver,
       handleShowVersionMenu,
-      editBlock
+      editBlock,
+      formatDate
     }
   }
 }
@@ -382,6 +412,49 @@ export default {
   }
 }
 
+.header {
+  display: flex;
+  align-items: center;
+  height: 24px;
+  background-color: var(--te-common-bg-container);
+  color: var(--te-common-text-secondary);
+
+  & > div {
+    padding: 0 8px;
+    position: relative;
+  }
+
+  .col-time::before,
+  .col-created-by::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1px;
+    height: 10px;
+    background-color: var(--te-common-border-default);
+  }
+}
+
+.col-checkbox,
+.block-item-small-list:deep(.table-selection) {
+  width: 40px;
+  text-align: center;
+}
+.col-checkbox:deep(.tiny-checkbox__label) {
+  padding: 0;
+}
+.col-name {
+  width: 35%;
+}
+.col-time {
+  width: 35%;
+}
+.col-created-by {
+  flex: 1;
+}
+
 .block-list {
   display: grid;
   grid-template-columns: repeat(v-bind('gridColumns'), 1fr);
@@ -391,10 +464,6 @@ export default {
   overflow-x: hidden;
   color: var(--ti-lowcode-common-secondary-text-color);
 
-  &.is-small-list {
-    grid-template-columns: 100%;
-    grid-template-rows: repeat(auto-fill, 30px);
-  }
   .block-item {
     display: flex;
     flex-direction: column;
@@ -403,10 +472,7 @@ export default {
     height: 110px;
     text-align: center;
     user-select: none;
-
-    &.block-item-small-list:nth-child(2) {
-      border-top: none;
-    }
+    gap: 6px;
 
     .publish-flag {
       position: absolute;
@@ -423,20 +489,16 @@ export default {
     }
 
     &.block-item-small-list {
-      flex-direction: row;
-      align-items: center;
-      height: 30px;
-      padding: 4px 10px;
-      .item-image {
-        width: 30px;
-        height: 30px;
-        min-width: 30px;
+      color: var(--te-common-text-primary);
+      gap: 0;
+      &:deep(.block-item-img) {
+        width: 54px;
+        height: 40px;
+        flex: unset;
+        margin-left: 8px;
       }
       .item-text {
-        text-align: left;
-        margin-top: 0;
-        margin-left: 4px;
-        color: var(--ti-lowcode-base-text-color-4);
+        width: calc(35% - 62px);
       }
       .publish-flag {
         position: static;
@@ -524,12 +586,6 @@ export default {
       }
     }
 
-    .item-image {
-      width: 100px;
-      height: 48px;
-      overflow: hidden;
-      object-fit: cover;
-    }
     .item-default-img {
       width: 84px;
       height: 50px;
@@ -537,10 +593,10 @@ export default {
     }
 
     .item-text {
-      color: var(--ti-lowcode-component-block-list-item-color);
+      color: var(--te-common-text-secondary);
       text-align: center;
-      flex: 1;
-      margin-top: 10px;
+      font-size: 12px;
+      line-height: 1.5;
       overflow: hidden;
       text-overflow: ellipsis;
       max-width: 100%;
@@ -662,16 +718,10 @@ export default {
 
   &.is-small-list {
     display: block;
-    grid-template-columns: initial;
 
     .block-item {
+      height: 54px;
       flex-direction: row;
-      border-right: none;
-    }
-
-    .item-image {
-      padding: 0;
-      flex-shrink: 0;
     }
 
     .item-text {
@@ -688,21 +738,16 @@ export default {
         font-size: 12px;
       }
     }
-  }
 
-  &.is-small-list {
-    .block-item {
-      height: 38px;
+    .cell {
+      padding: 0 8px;
+      text-align: start;
     }
-
-    .item-image {
-      font-size: 1.5em;
-      width: 27px;
-      height: 22px;
+    .cell-time {
+      width: 35%;
     }
-
-    .item-text {
-      width: calc(100% - 35px);
+    .cell-created-by {
+      flex: 1;
     }
   }
 }
