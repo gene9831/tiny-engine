@@ -37,7 +37,7 @@
         </div>
 
         <div v-if="blockStyle === 'mini'" class="cell cell-time">
-          <span>{{ formatDate(new Date(item.created_at)) }}</span>
+          <span>{{ format(item.created_at, 'yyyy/MM/dd hh:mm:ss') }}</span>
         </div>
         <div v-if="blockStyle === 'mini'" class="cell cell-created-by">
           <span>{{ users.find((user) => user.id === item.id)?.name || item.id }}</span>
@@ -128,6 +128,7 @@
 
 <script>
 import { computed, watch, inject, reactive } from 'vue'
+import { format } from '@opentiny/vue-renderless/common/date'
 import { iconPlus } from '@opentiny/vue-icon'
 import { Progress, Tooltip } from '@opentiny/vue'
 import PluginBlockItemImg from './PluginBlockItemImg.vue'
@@ -345,17 +346,6 @@ export default {
       }
     )
 
-    const formatDate = (date) => {
-      const year = date.getFullYear()
-      const month = String(date.getMonth() + 1).padStart(2, '0')
-      const day = String(date.getDate()).padStart(2, '0')
-      const hours = String(date.getHours()).padStart(2, '0')
-      const minutes = String(date.getMinutes()).padStart(2, '0')
-      const seconds = String(date.getSeconds()).padStart(2, '0')
-
-      return `${year}/${month}/${day} ${hours}:${minutes}:${seconds}`
-    }
-
     return {
       isShortcutPanel: panelState.isShortcutPanel,
       state,
@@ -373,7 +363,7 @@ export default {
       handleSettingMouseOver,
       handleShowVersionMenu,
       editBlock,
-      formatDate
+      format
     }
   }
 }
