@@ -40,7 +40,7 @@
           <span>{{ format(item.created_at, 'yyyy/MM/dd hh:mm:ss') }}</span>
         </div>
         <div v-if="blockStyle === 'mini'" class="cell cell-created-by">
-          <span>{{ users.find((user) => user.id === item.id)?.name || item.id }}</span>
+          <span>{{ users.find((user) => user.id === item.createdBy)?.name || item.id }}</span>
         </div>
 
         <div v-if="item.isShowProgress" class="progress-bar">
@@ -408,6 +408,9 @@ export default {
   height: 24px;
   background-color: var(--te-common-bg-container);
   color: var(--te-common-text-secondary);
+  position: sticky;
+  top: 0;
+  z-index: 100;
 
   & > div {
     padding: 0 8px;
@@ -463,6 +466,8 @@ export default {
     text-align: center;
     user-select: none;
     gap: 6px;
+    overflow: hidden;
+    text-overflow: ellipsis;
 
     .publish-flag {
       position: absolute;

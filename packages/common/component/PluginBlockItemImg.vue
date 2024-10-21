@@ -88,7 +88,7 @@ export default {
 }
 
 .item-image {
-  width: 100px;
+  width: 84px;
   height: 48px;
   overflow: hidden;
   object-fit: cover;

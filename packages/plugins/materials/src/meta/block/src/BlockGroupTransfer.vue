@@ -109,7 +109,7 @@ export default {
             message({ message: `${blockDetail.label}区块缺少历史记录，请重新发布区块`, status: 'error' })
           } else {
             block.latestVersion = blockDetail?.histories[historyLength - 1]?.version
-            check(state.blockList, block)
+            check(block)
           }
         })
       } else {
