@@ -388,8 +388,8 @@ export default {
         margin-right: 4px;
       }
       & .label {
-        flex: 1;
         font-size: 12px;
+        flex: 1;
       }
     }
 
