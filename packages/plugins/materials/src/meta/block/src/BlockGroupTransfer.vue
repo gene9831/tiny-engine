@@ -155,7 +155,7 @@ export default {
 
   .block-add-transfer-body {
     min-height: calc(100% - 42px);
-    padding-top: 12px;
+    margin-top: 12px;
     overflow-y: auto;
   }
 

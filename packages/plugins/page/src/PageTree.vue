@@ -370,6 +370,12 @@ export default {
   }
 }
 
+.page-manage-collapse.page-manage-collapse {
+  :deep(.tiny-collapse-item__content) {
+    padding-top: 0;
+  }
+}
+
 .app-manage-tree {
   :deep(.tiny-tree) {
     .tiny-tree-node__label {
@@ -383,6 +389,7 @@ export default {
       }
       & .label {
         flex: 1;
+        font-size: 12px;
       }
     }
 
