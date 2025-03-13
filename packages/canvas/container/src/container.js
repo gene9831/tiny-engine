@@ -394,7 +394,7 @@ export const scrollToNode = (element) => {
   return nextTick()
 }
 
-const { clearMultiSelection, setMultiSelection, multiSelectedStates, multiStateLength } = useMultiSelect()
+const { multiSelectedStates, multiStateLength } = useMultiSelect()
 
 const setSelectRect = (element, multiNodeId) => {
   element = element || getDocument().body
@@ -754,11 +754,6 @@ export const selectNode = async (id, type) => {
   await scrollToNode(element)
   setSelectRect(element)
 
-  if (type === 'clickTree') {
-    clearMultiSelection()
-    setMultiSelection(selectState)
-  }
-
   canvasState.emit('selected', node, parent, type, id)
 
   return node
@@ -911,6 +906,7 @@ export const canvasApi = {
   dragMove,
   setLocales,
   getRenderer,
+  querySelectById,
   clearSelect,
   selectNode,
   hoverNode,

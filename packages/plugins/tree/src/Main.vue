@@ -13,7 +13,7 @@
         label-key="componentName"
         :data="state.pageSchema"
         :draggable="true"
-        :active="pageState.currentSchema?.id"
+        :actives="idsOfSelected"
         :disallow-drop="disallowDrop"
         class="outline-tree"
         @click="handleClickRow"
@@ -41,7 +41,7 @@
 import { reactive, watch, computed, onActivated, onDeactivated, nextTick } from 'vue'
 import { PluginPanel, SvgButton } from '@opentiny/tiny-engine-common'
 import { constants } from '@opentiny/tiny-engine-utils'
-import { useCanvas, useMaterial, useLayout, useMessage } from '@opentiny/tiny-engine-meta-register'
+import { useCanvas, useMaterial, useLayout, useMessage, getMergeMeta } from '@opentiny/tiny-engine-meta-register'
 import { extend } from '@opentiny/vue-renderless/common/object'
 import DraggableTree from './DraggableTree.vue'
 
@@ -64,6 +64,19 @@ export default {
     const { PLUGIN_NAME } = useLayout()
 
     const panelFixed = computed(() => props.fixedPanels?.includes(PLUGIN_NAME.OutlineTree))
+
+    const containerApis = getMergeMeta('engine.canvas.container').api
+    const { multiSelectedStates, multiStateLength, toggleMultiSelection } = containerApis.useMultiSelect()
+    const selectState = containerApis.getSelectState()
+
+    const selectedStates = computed(() => {
+      if (multiStateLength.value > 1) {
+        return multiSelectedStates.value
+      }
+      return [{ ...selectState, id: pageState.currentSchema?.id }]
+    })
+
+    const idsOfSelected = computed(() => selectedStates.value.map((state) => state.id))
 
     const filterSchema = (data) => {
       const translateChild = (data) => {
@@ -139,6 +152,16 @@ export default {
       hoverNode(row.id)
     }
 
+    const handleSelectNode = (event, id) => {
+      const { querySelectById } = useCanvas().canvasApi.value
+      const element = querySelectById(id)
+      toggleMultiSelection(event, element)
+
+      const { selectNode } = useCanvas().canvasApi.value
+
+      selectNode(id, 'clickTree')
+    }
+
     const disallowDrop = ({ dragged, target, position }) => {
       if (dragged.id === 'body') {
         return true
@@ -174,20 +197,19 @@ export default {
         }
       }
 
-      const { insertNode, removeNode, selectNode } = useCanvas().canvasApi.value
+      const { insertNode, removeNode } = useCanvas().canvasApi.value
       removeNode(dragged.id)
       insertNode(
         { data: dragged.rawData, node: target.rawData, parent: target.parent.rawData },
         position === 'center' ? 'in' : position
       )
       nextTick(() => {
-        selectNode(dragged.id, 'clickTree')
+        handleSelectNode({}, dragged.id)
       })
     }
 
-    const handleClickRow = (row) => {
-      const { selectNode } = useCanvas().canvasApi.value
-      selectNode(row.id, 'clickTree')
+    const handleClickRow = (event, row) => {
+      handleSelectNode(event, row.id)
     }
 
     const getIconName = (row) => {
@@ -197,6 +219,7 @@ export default {
 
     return {
       panelFixed,
+      idsOfSelected,
       eyeOpen,
       showNode,
       state,
