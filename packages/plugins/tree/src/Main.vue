@@ -27,8 +27,8 @@
               row.label
             }}</span>
             <template v-if="row.id !== 'body'">
-              <svg-icon v-if="eyeOpen(row.id)" name="eye" @mouseup="showNode(row.rawData)"></svg-icon>
-              <svg-icon v-if="!eyeOpen(row.id)" name="eye-invisible" @mouseup="showNode(row.rawData)"></svg-icon>
+              <svg-icon :name="eyeOpen(row.id) ? 'eye' : 'eye-invisible'" @mouseup="showNode(row.rawData)"></svg-icon>
+              <svg-icon name="delete" @mouseup="delNode(row.rawData)"></svg-icon>
             </template>
           </div>
         </template>
@@ -41,7 +41,14 @@
 import { reactive, watch, computed, onActivated, onDeactivated, nextTick } from 'vue'
 import { PluginPanel, SvgButton } from '@opentiny/tiny-engine-common'
 import { constants } from '@opentiny/tiny-engine-utils'
-import { useCanvas, useMaterial, useLayout, useMessage, getMergeMeta } from '@opentiny/tiny-engine-meta-register'
+import {
+  useCanvas,
+  useMaterial,
+  useLayout,
+  useMessage,
+  getMergeMeta,
+  useHistory
+} from '@opentiny/tiny-engine-meta-register'
 import { extend } from '@opentiny/vue-renderless/common/object'
 import DraggableTree from './DraggableTree.vue'
 
@@ -146,6 +153,16 @@ export default {
       clearSelect()
     }
 
+    const delNode = (data) => {
+      const { clearSelect } = useCanvas().canvasApi.value
+      useCanvas().operateNode({
+        type: 'delete',
+        id: data.id
+      })
+      clearSelect()
+      useHistory().addHistory()
+    }
+
     const handleMouseEnterRow = (row) => {
       const { hoverNode } = useCanvas().canvasApi.value
 
@@ -221,6 +238,7 @@ export default {
       panelFixed,
       idsOfSelected,
       eyeOpen,
+      delNode,
       showNode,
       state,
       PLUGIN_NAME,
@@ -255,11 +273,15 @@ export default {
       color: var(--te-common-icon-hover);
     }
   }
-  svg.icon-eye {
+  svg.icon-eye,
+  svg.icon-delete {
     visibility: hidden;
   }
-  .tree-row:hover svg.icon-eye {
-    visibility: unset;
+  .tree-row:hover {
+    svg.icon-eye,
+    svg.icon-delete {
+      visibility: unset;
+    }
   }
   .row-content {
     flex: 1;
