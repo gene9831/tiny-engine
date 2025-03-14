@@ -1,5 +1,5 @@
 <template>
-  <plugin-panel class="outlinebox plugin-tree" title="大纲树" @close="$emit('close')">
+  <plugin-panel class="outlinebox plugin-tree" title="大纲树" @close="$emit('close')" ref="panelRef">
     <template #header>
       <svg-button
         class="item icon-sidebar"
@@ -38,7 +38,7 @@
 </template>
 
 <script>
-import { reactive, watch, computed, onActivated, onDeactivated, nextTick } from 'vue'
+import { reactive, watch, computed, onActivated, onDeactivated, nextTick, ref, onMounted, onBeforeUnmount } from 'vue'
 import { PluginPanel, SvgButton } from '@opentiny/tiny-engine-common'
 import { constants } from '@opentiny/tiny-engine-utils'
 import {
@@ -234,6 +234,26 @@ export default {
       return iconName.toLowerCase()
     }
 
+    const panelRef = ref(null)
+
+    const handleCopy = (event) => {
+      // TODO
+      // eslint-disable-next-line no-console
+      console.log(event)
+    }
+
+    onMounted(() => {
+      if (panelRef.value) {
+        panelRef.value.$el.addEventListener('copy', handleCopy)
+      }
+    })
+
+    onBeforeUnmount(() => {
+      if (panelRef.value) {
+        panelRef.value.$el.removeEventListener('copy', handleCopy)
+      }
+    })
+
     return {
       panelFixed,
       idsOfSelected,
@@ -247,7 +267,8 @@ export default {
       handleClickRow,
       handleMouseEnterRow,
       disallowDrop,
-      handleDrop
+      handleDrop,
+      panelRef
     }
   }
 }
